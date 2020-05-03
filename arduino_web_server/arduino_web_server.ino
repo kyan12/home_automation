@@ -147,7 +147,7 @@ void loop() {
         SendHTTPResponse(connectionId, "200 OK", "success");
       }
       else if (httpRequest.indexOf("pump_off HTTP/1.1")!= -1)  {
-        digitalWrite(LIGHT_RELAY, HIGH);
+        digitalWrite(PUMP_RELAY, HIGH);
         pump_status = 0;
         SendHTTPResponse(connectionId, "200 OK", "success");
       }

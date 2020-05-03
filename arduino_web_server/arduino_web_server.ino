@@ -14,8 +14,8 @@
 #define ULTRA_TRIG 4
 #define ULTRA_ECHO 5
 #define DHT 6
-#define RELAY1 12
-#define RELAY2 13
+#define PUMP_RELAY 12
+#define LIGHT_RELAY 13
 
 
 #define AT_OK "OK\r\n"
@@ -68,7 +68,7 @@ void SendHTTPResponse(const int connection_id,
 
   sprintf(buffer, "AT+CIPCLOSE=%d", connection_id);
   SendCommand(buffer);
-  AwaitResponse(AT_OK, 3000);
+  AwaitResponse(AT_OK, 9000);
 }
 
 void InitWifiModule() {
@@ -98,18 +98,21 @@ void setup() {
   esp8266.begin(BAUDRATE);
 
   pinMode(DHT, INPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(RELAY2, OUTPUT);
+  pinMode(PUMP_RELAY, OUTPUT);
+  pinMode(LIGHT_RELAY, OUTPUT);
 
-  digitalWrite(RELAY1, HIGH);
-  digitalWrite(RELAY2, HIGH);
+  digitalWrite(PUMP_RELAY, HIGH);
+  digitalWrite(LIGHT_RELAY, HIGH);
+
+  stepper.setSpeed(400);
 
   InitWifiModule();
   Serial.println("Ready for connection");
 
 
 }
-
+int led_status = 0;
+int pump_status = 0;
 void loop() {
 
   char buffer[256];
@@ -131,19 +134,31 @@ void loop() {
 
       if (httpRequest.indexOf("led_on HTTP/1.1")!= -1 ) {
         Serial.println("led on");
-        digitalWrite(RELAY2, LOW);
+        digitalWrite(LIGHT_RELAY, LOW);
+        led_status = 1;
         SendHTTPResponse(connectionId, "200 OK", "success");
       }
       else if (httpRequest.indexOf("led_off HTTP/1.1")!= -1)  {
-        digitalWrite(RELAY2, HIGH);
+        digitalWrite(LIGHT_RELAY, HIGH);
+        led_status = 0;
         SendHTTPResponse(connectionId, "200 OK", "success");
       }
       else if (httpRequest.indexOf("pump_on HTTP/1.1")!= -1)  {
-        digitalWrite(RELAY1, LOW);
+        digitalWrite(PUMP_RELAY, LOW);
+        pump_status = 1;
         SendHTTPResponse(connectionId, "200 OK", "success");
       }
       else if (httpRequest.indexOf("pump_off HTTP/1.1")!= -1)  {
-        digitalWrite(RELAY2, HIGH);
+        digitalWrite(LIGHT_RELAY, HIGH);
+        pump_status = 0;
+        SendHTTPResponse(connectionId, "200 OK", "success");
+      }
+      else if (httpRequest.indexOf("stepper_up HTTP/1.1")!= -1)  {
+        stepper.step(2048);
+        SendHTTPResponse(connectionId, "200 OK", "success");
+      }
+      else if (httpRequest.indexOf("stepper_down HTTP/1.1")!= -1)  {
+        stepper.step(-2048);
         SendHTTPResponse(connectionId, "200 OK", "success");
       }
       else if (httpRequest.indexOf("sensors HTTP/1.1")!= -1)  {
@@ -159,6 +174,10 @@ void loop() {
         ret += hum;
         ret += ',';
         ret += dist;
+        ret += ',';
+        ret += led_status;
+        ret += ',';
+        ret += pump_status;
 
         SendHTTPResponse(connectionId, "200 OK", ret);
       }

@@ -17,6 +17,8 @@
     <h3>Humidity: {{ humidity }}</h3>
     <h3>Plant Height {{ height }}</h3>
     <h3>Light: {{ led }}</h3>
+    <h3>Pump Status: {{ pump }}</h3>
+
     <p><input type="submit" name="sensors" value="REFRESH"></p>
 
 
@@ -32,11 +34,12 @@
       <input type="submit" name="pump" value="Turn On">
       <input type="submit" name="pump" value="Turn Off">
     </p>
-    <h2>Water Pump</h2>
+    <h2>Light Height</h2>
     <p>
-      <input type="submit" name="submit" value="Turn On">
-      <input type="submit" name="submit" value="Turn On">
+      <input type="submit" name="stepper" value="Raise">
+      <input type="submit" name="stepper" value="Lower">
     </p>
+
 
     </form>
 

@@ -39,10 +39,8 @@ mail = Mail(app)
 author = 'IoT Hydroponics'
 led_status = 'OFF'
 pump_status = 'OFF'
-temp = 0
-hum = 0
-ultra = 0
 resp = requests.get(url=f'{ ESP8266_IP }/sensors')
+print(resp.headers['data'])
 temp_hum_ultra = resp.headers['data'].split(',')
 temp = temp_hum_ultra[0]
 hum = temp_hum_ultra[1]
@@ -102,8 +100,8 @@ def dashboard():
         author=author,
         led=led_status,
         pump=pump_status,
-        temperature=temp,
-        humidity=hum,
+        temperature='75 C',
+        humidity='56%',
         height=ultra
     )
 

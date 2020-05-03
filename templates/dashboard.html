@@ -1,0 +1,44 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ author }}'s app</title>
+  </head>
+
+  <body style="background-color: seagreen; color: seashell; text-align: center;">
+    <h1>IoT Hydroponics</h2>
+
+    <form  action="/" method="post">
+
+    <h2>Sensor Readings</h2>
+
+    <h3>Temperature: {{ temperature }}</h3>
+    <h3>Humidity: {{ humidity }}</h3>
+    <h3>Plant Height {{ height }}</h3>
+    <h3>Light: {{ led }}</h3>
+    <p><input type="submit" name="sensors" value="REFRESH"></p>
+
+
+
+
+    <h2>Grow Lights</h2>
+    <p>
+      <input type="submit" name="LED" value="Turn On">
+      <input type="submit" name="LED" value="Turn Off">
+    </p>
+    <h2>Air Pump</h2>
+    <p>
+      <input type="submit" name="pump" value="Turn On">
+      <input type="submit" name="pump" value="Turn Off">
+    </p>
+    <h2>Water Pump</h2>
+    <p>
+      <input type="submit" name="submit" value="Turn On">
+      <input type="submit" name="submit" value="Turn On">
+    </p>
+
+    </form>
+
+  </body>
+</html>

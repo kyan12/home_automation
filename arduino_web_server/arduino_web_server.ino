@@ -19,12 +19,12 @@ String SendData(String command, const int timeout) {
     }
   }
   if (DEBUG) {
-    Serial.println(response);      
+    Serial.println(response);
   }
   return response;
 }
 
-void InitWifiModule() {      
+void InitWifiModule() {
   SendData("AT+RST\r\n", 2000);
   char buffer[50];
   sprintf(buffer, "AT+CWJAP=\"%s\",\"%s\"\r\n", WIFI_SSID, WIFI_PASS);
@@ -37,30 +37,40 @@ void InitWifiModule() {
   SendData("AT+CIPSERVER=1,80\r\n", 5000);
 }
 
-void setup() {  
+void setup() {
   Serial.begin(BAUDRATE);
   esp8266.begin(BAUDRATE);
-  
+
   InitWifiModule();
   Serial.println("Waiting for connection...");
-}      
+}
 
 void loop() {
   char buffer[256];
-  if (esp8266.available()) {      
+  if (esp8266.available()) {
     if (esp8266.find("+IPD,")) {
       delay(1000);
       int connectionId = esp8266.read() - 48;
       Serial.print("Connection ID: ");
       Serial.println(connectionId);
 
-      sprintf(buffer, "AT+CIPSEND=%d,2\r\n", connectionId);
+      delay(2500);
+
+      String data = "";
+      while (esp8266.available()) {
+        data += esp8266.readString();
+      }
+      Serial.print("DATA: ");
+      Serial.println(data);
+      delay(3000);
+
+      sprintf(buffer, "AT+CIPSEND=%d,15\r\n", connectionId);
       SendData(buffer, 4000);
       delay(500);
-      SendData("OK\r\n", 1000);
+      SendData("HTTP/1.1 200 OK\r\n", 1000);
 
       sprintf(buffer, "AT+CIPCLOSE=%d\r\n", connectionId);
       SendData(buffer, 1000);
-    }      
+    }
   }
 }

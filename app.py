@@ -8,6 +8,8 @@ import sys
 import mimetypes
 import requests
 
+from requests import Request, Session
+
 from flask import Flask, flash, request, redirect, url_for
 from flask import render_template, send_from_directory, jsonify
 from flask_mail import Mail, Message
@@ -39,39 +41,51 @@ def dashboard():
     author = 'IoT Hydroponics'
     led_status = 'off'
     pump_status = 'off'
-    temp_hum_ultra = '98/50/on'
+    temp = 0
+    hum = 0
+    ultra = 0
     # A button was pressed
     if request.method == 'POST':
-        if request.form['LED'] == 'Turn On':
-            resp = requests.get(url=ESP8266_IP, params='led_on')
-            print(resp)
-            led_status = 'on'
-            print('Turn on LED')
-        elif request.form['LED'] == 'Turn Off':
-            resp = requests.get(url=ESP8266_IP, params='led_off')
-            led_status = 'off'
-            print('Turn off LED')
-        if request.form['pump'] == 'Turn On':
-            resp = requests.get(url=ESP8266_IP, params='led_on')
-            pump_status = 'on'
-            print('Turn on pump')
-        elif request.form['pump'] == 'Turn Off':
-            resp = requests.get(url=ESP8266_IP, params='led_off')
-            pump_status = 'off'
-            print('Turn off pump')
-        if request.form['sensors'] == 'REFRESH':
-            resp = requests.get(url=ESP8266_IP, params='sensors')
-            print(resp)
-            temp_hum_ultra = resp
-            print('Readings refreshed')
+        if 'LED' in request.form:
+            if request.form['LED'] == 'Turn On':
+                print('led on')
+                resp = requests.get(url=f'{ESP8266_IP}/led_on')
+                print(resp)
+                led_status = 'on'
+                print('Turn on LED')
+            elif request.form['LED'] == 'Turn Off':
+                print('led off')
+                resp = requests.get(url=f'{ESP8266_IP}/led_off')
+                led_status = 'off'
+                print('Turn off LED')
+        if 'pump' in request.form:
+            if request.form['pump'] == 'Turn On':
+                print('pump on')
+                resp = requests.get(url=f'{ ESP8266_IP }/pump_on')
+                print(resp)
+                pump_status = 'on'
+                print('Turn on pump')
+            elif request.form['pump'] == 'Turn Off':
+                print('pump off')
+                resp = requests.get(url=f'{ ESP8266_IP }/pump_off')
+                pump_status = 'off'
+                print('Turn off pump')
+        if 'sensors' in request.form:
+            if request.form['sensors'] == 'REFRESH':
+                resp = requests.get(url=f'{ ESP8266_IP }/sensors')
+                temp_hum_ultra = resp.headers['data'].split(',')
+                temp = temp_hum_ultra[0]
+                hum = temp_hum_ultra[1]
+                ultra = temp_hum_ultra[2]
+                print('Readings refreshed')
     return render_template(
         'dashboard.html',
         author=author,
         led=led_status,
         pump=pump_status,
-        temperature=temp_hum_ultra,
-        humidity=temp_hum_ultra,
-        height=temp_hum_ultra
+        temperature=temp,
+        humidity=hum,
+        height=ultra
     )
 
 def main():

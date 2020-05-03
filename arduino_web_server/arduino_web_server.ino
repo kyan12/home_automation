@@ -3,7 +3,6 @@
 #include <SoftwareSerial.h>
 #include <Stepper.h>
 #include "SR04.h"
-#include <dht_nonblocking.h>
 
 #include "credentials.h"
 
@@ -21,7 +20,6 @@
 #define AT_OK "OK\r\n"
 
 SoftwareSerial esp8266(2, 3);
-DHT_nonblocking dht_sensor(DHT, DHT_SENSOR_TYPE);
 Stepper stepper(STEPS, 8, 10, 9, 11);
 
 
@@ -166,8 +164,6 @@ void loop() {
         long dist = sr04.Distance();
         float temp = 0;
         float hum = 0;
-        bool res = dht_sensor.measure( &temp, &hum );
-        Serial.println(res);
         String ret;
         ret += temp;
         ret += ',';
